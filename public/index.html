@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+        <link href="styles.css" rel="stylesheet" type="text/css"/>
+        <title>Ninjago</title>
+    </head>
+    <body>
+        <h1 class="title">Ninjago - a Ninja REST API</h1>
+        <div id="homepage">
+            <h1>Hire a ninja in your area!</h1>
+            <div id="ninjas"></div>
+        </div>
+
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+        <script src="https://unpkg.com/react@15/dist/react.js"></script>
+        <script src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
+
+
+        <!-- React Component -->
+        <script type="text/babel">
+            var Ninjas= React.createClass({
+
+                getInitialState: function(){
+                    return({
+                        ninjas:[]
+                    });
+                },
+
+                render: function(){
+                    var ninjas = this.state.ninjas;
+                    ninjas=ninjas.map(function(ninja,index){
+                        return(
+                            <li key={index}>
+                                <span className={ninja.obj.available}></span>
+                                <span className="name">{ninja.obj.name}</span>
+                                <span className="rank">{ninja.obj.rank}</span>
+                                <span className="dist">{Math.floor(ninja.dis/1000)} km</span>
+                            </li>
+                        );
+                    });
+                    return(
+                        <div id='ninja-container'>
+
+                            <form id='search' onSubmit={this.handleSubmit}>
+                                <label>Enter your latitude</label>
+                                <input placeholder="latitude" type='text' ref='lat' required/>
+                                <label>Enter your longitude</label>
+                                <input placeholder="longitude" type='text' ref='lon' required/>
+                                <input type='submit' value="Find Ninjas" />
+                            </form>
+                            <ul>{ninjas}</ul>
+
+                        </div>
+                    );
+                },
+                handleSubmit:function(event){
+                    event.preventDefault();
+                    var lon = this.refs.lon.value;
+                    var lat = this.refs.lat.value;
+
+                    fetch('/api/ninjas/?lon='+lon+'&lat='+lat).then(function(data){
+                        return data.json();
+                    }).then(json=>{
+                        this.setState({
+                            ninjas:json
+                        });
+                    });
+                }
+            });
+
+            ReactDOM.render(<Ninjas/>,document.getElementById('ninjas'));
+        </script>
+
+    </body>
+</html>
